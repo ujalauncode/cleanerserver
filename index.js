@@ -13,7 +13,7 @@ const port = process.env.port || 3001;
 
 app.use(
     cors({
-      origin: "http://localhost:1420",
+      origin: "*",
     })
   );
 
@@ -46,21 +46,13 @@ app.use(
         }
       }
   
-      console.log('Temporary files cleanup complete.');
+      console.log('Temporary files and Prefetch files cleanup complete.');
       res.status(200).send('Temporary files cleanup complete.');
     } catch (error) {
       console.error('Error during temporary files cleanup:', error.message);
       res.status(500).send(`Error during temporary files cleanup: ${error.message}`);
     }
   });
-
-
-
-
-
-
-
-
 
   
 app.listen(port, () => {

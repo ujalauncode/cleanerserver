@@ -27,32 +27,50 @@ app.use(
 
   app.post('/delete-temp-files', async (req, res) => {
     try {
-      // List of directories to delete files from
-      const directoriesToDelete = [
-        'C:\\Windows\\Temp\\*',
-        'C:\\Windows\\Prefetch\\*',
-        'C:\\Documents and Settings\\*\\Local Settings\\temp\\*',
-        'C:\\Users\\*\\Appdata\\Local\\Temp\\*'
+      const directoriesToCleanup = [
+          'C:\\Windows\\Temp\\*',
+          'C:\\Windows\\Prefetch\\*',
+          'C:\\Users\\*\\Appdata\\Local\\Temp\\*'
+          // Add other directories as needed
       ];
-        for (const directory of directoriesToDelete) {
-        const files = glob.sync(directory);
-          for (const file of files) {
-          try {
-            await fs.unlink(file);
-            console.log(`Deleted file: ${file}`);
-          } catch (error) {
-            console.error(`Error deleting file ${file}: ${error.message}`);
-          }
-        }
-      }
-  
-      console.log('Temporary files and Prefetch files cleanup complete.');
-      res.status(200).send('Temporary files cleanup complete.');
-    } catch (error) {
-      console.error('Error during temporary files cleanup:', error.message);
-      res.status(500).send(`Error during temporary files cleanup: ${error.message}`);
-    }
+
+      // Execute cleanup operation for each directory
+      directoriesToCleanup.forEach(directory => {
+          const command = `del /q ${directory}`;
+          exec(command, (error, stdout, stderr) => {
+              if (error) {
+                  console.error(`Error executing command: ${error.message}`);
+                  res.status(500).send(`Error executing command: ${error.message}`);
+                  return;
+              }
+              if (stderr) {
+                  console.error(`Command stderr: ${stderr}`);
+                  res.status(500).send(`Command stderr: ${stderr}`);
+                  return;
+              }
+              console.log(`Command stdout: ${stdout}`);
+          });
+      });
+
+      res.status(200).send('Cleanup operation initiated.');
+  } catch (error) {
+      console.error(`Error during cleanup operation: ${error.message}`);
+      res.status(500).send(`Error during cleanup operation: ${error.message}`);
+  }
   });
+
+
+
+
+
+
+
+
+
+  
+
+
+
 
   
 app.listen(port, () => {
